@@ -19,6 +19,7 @@
 # no arguments are indicated.
 ##
 include mk/projectdir.mk
+-include mk/private.mk
 include mk/variables.mk
 
 include mk/help.mk
@@ -39,3 +40,5 @@ include mk/meta-repos.mk
 include mk/repos.mk
 include mk/meta-prometheus.mk
 include mk/prometheus.mk
+include mk/meta-ephemeral.mk
+include mk/ephemeral.mk

@@ -41,8 +41,9 @@ docker-login:
 	$(DOCKER) login -u "$(DOCKER_LOGIN_USER)" -p "$(DOCKER_LOGIN_TOKEN)" $(DOCKER_REGISTRY)
 
 .PHONY: docker-build
+docker-build: QUAY_EXPIRATION ?= 1d
 docker-build:  ## Build image DOCKER_IMAGE from DOCKER_DOCKERFILE using the DOCKER_CONTEXT_DIR
-	$(DOCKER) build $(DOCKER_BUILD_OPTS) -t "$(DOCKER_IMAGE)" $(DOCKER_CONTEXT_DIR) -f "$(DOCKER_DOCKERFILE)"
+	$(DOCKER) build --label "quay.expires-after=$(QUAY_EXPIRATION)" $(DOCKER_BUILD_OPTS) -t "$(DOCKER_IMAGE)" $(DOCKER_CONTEXT_DIR) -f "$(DOCKER_DOCKERFILE)"
 .PHONY: docker-push
 docker-push:  ## Push image to remote registry
 	$(DOCKER) push "$(DOCKER_IMAGE)"

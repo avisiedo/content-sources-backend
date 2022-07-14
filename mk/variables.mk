@@ -77,7 +77,7 @@ DOCKER_CONTEXT_DIR ?= .
 # Path to the main project Dockerfile file
 DOCKER_DOCKERFILE ?= build/Dockerfile
 # Base image name
-DOCKER_IMAGE_BASE ?= quay.io/$(QUAY_USER)/content-sources
+DOCKER_IMAGE_BASE ?= quay.io/$(firstword $(subst +, ,$(QUAY_USER)))/$(APP_NAME)-$(APP_COMPONENT)
 # Default image tag is set to the short git hash of the repo
 DOCKER_IMAGE_TAG ?= $(shell git rev-parse --short HEAD)
 # Compose the container image with all the above

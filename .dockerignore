@@ -2,4 +2,7 @@ release/**
 vendor
 kafka/data
 .vscode/**
+
+# Avoid the files on this directory could be copied to the container
 configs/secrets
+*.log

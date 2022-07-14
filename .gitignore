@@ -35,3 +35,9 @@ kafka/data
 # Prometheus
 prometheus/data
 configs/prometheus.yaml
+
+# Ignore files on this directory
+configs/secrets
+
+# Ignore local logs
+*.log
