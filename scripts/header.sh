@@ -19,5 +19,12 @@ function error {
 
 [ "${ORG_ID}" != "" ] || error "ORG_ID is required and cannot be empty"
 
-ENC="$(echo "{\"identity\":{\"type\":\"Associate\",\"account_number\":\"$2\",\"internal\":{\"org_id\":\"$1\"}}}" | base64 -w0)"
+if [ "$( uname -s )" == "Darwin" ]; then
+BASE64ENC="base64"
+else
+BASE64ENC="base64 -w0"
+fi
+export BASE64ENC
+
+ENC="$(echo "{\"identity\":{\"type\":\"Associate\",\"account_number\":\"$2\",\"internal\":{\"org_id\":\"$1\"}}}" | $BASE64ENC )"
 echo "x-rh-identity: $ENC"
