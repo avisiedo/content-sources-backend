@@ -1,0 +1,64 @@
+version: '3'
+services:
+  postgres-content:
+    image: "docker.io/library/postgres:14"
+    ports:
+      - ${CONTENT_DATABASE_PORT:-5433}:5432
+    environment:
+      POSTGRES_USER: ${CONTENT_DATABASE_USER:-content}
+      POSTGRES_PASSWORD: ${CONTENT_DATABASE_PASSWORD:-content}
+      POSTGRES_DB: ${CONTENT_DATABASE_NAME:-content}
+      POSTGRES_INITDB_ARGS: '--auth-host=scram-sha-256'
+      POSTGRES_HOST_AUTH_METHOD: 'scram-sha-256'
+    volumes:
+      - ${CONTENT_DATABASE_NAME:-content}:/var/lib/postgresql/data/
+    healthcheck:
+      test: pg_isready
+      interval: 5s
+      retries: 10
+      timeout: 3s
+
+  zookeeper:
+    image: localhost/kafka:latest
+    command: /opt/kafka/scripts/zookeeper-entrypoint.sh
+    ports:
+      - "8778:8778"
+      - "9092:9092"
+      - "2181:2181"
+    networks:
+        - kafka
+    environment:
+      ZOOKEEPER_OPTS: "-Dzookeeper.4lw.commands.whitelist=*"
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
+    volumes:
+      - ${KAFKA_DATA_DIR}:/tmp/zookeeper:z
+      - ${KAFKA_CONFIG_DIR}:/tmp/config:z
+    healthcheck:
+      test: /opt/kafka/scripts/zookeeper-healthcheck.sh
+      interval: 5s
+      retries: 10
+      timeout: 3s
+      start_period: 3s
+
+  kafka:
+    image: localhost/kafka:latest
+    command: /opt/kafka/scripts/kafka-entrypoint.sh
+    networks:
+      - kafka
+#    network_mode: container:kafka-zookeeper
+    restart: "on-failure:5"
+    volumes:
+      - ${KAFKA_DATA_DIR}:/tmp/zookeeper:z
+      - ${KAFKA_CONFIG_DIR}:/tmp/config:z
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OPTS: '-javaagent:/usr/jolokia/agents/jolokia-jvm.jar=host=0.0.0.0'
+      KAFKA_TOPICS: "${KAFKA_TOPICS}"
+
+networks:
+  kafka: {}

@@ -37,3 +37,5 @@ include mk/meta-docker.mk
 include mk/docker.mk
 include mk/meta-repos.mk
 include mk/repos.mk
+include mk/meta-deps.mk
+include mk/deps.mk

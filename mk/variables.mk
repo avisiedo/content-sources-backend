@@ -37,7 +37,10 @@ LOAD_DB_CFG_WITH_YQ := y
 endif
 endif
 
-DATABASE_CONTAINER_NAME="postgres-content"
+COMPOSE_PROJECT_NAME=cs
+export COMPOSE_PROJECT_NAME
+
+DATABASE_CONTAINER_NAME=$(COMPOSE_PROJECT_NAME)_postgres-content_1
 ifeq (y,$(LOAD_DB_CFG_WITH_YQ))
 $(info info:Trying to load DATABASE configuration from '$(CONFIG_YAML)')
 DATABASE_HOST ?= $(shell yq -r -M '.database.host' "$(CONFIG_YAML)")
